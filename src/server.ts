@@ -1,13 +1,8 @@
-import { run } from "@mermaid-js/mermaid-cli";
+import { renderMermaid } from "@mermaid-js/mermaid-cli";
 import { serve } from "bun";
-import { mkdir, readFile, unlink, writeFile } from "fs/promises";
-import path from "path";
+import puppeteer from "puppeteer-core";
 
 const PORT = 3022;
-const TEMP_DIR = path.join(process.cwd(), "temp");
-
-// Ensure temp directory exists
-await mkdir(TEMP_DIR, { recursive: true });
 
 const server = serve({
   port: PORT,
@@ -23,27 +18,23 @@ const server = serve({
         return new Response("Invalid diagram data", { status: 400 });
       }
 
-      const tempInput = path.join(TEMP_DIR, `${Date.now()}.mmd`);
-      const tempOutput = path.join(TEMP_DIR, `${Date.now()}.png`);
-
-      await writeFile(tempInput, diagram);
-
-      await run(tempInput, tempOutput, {
-        puppeteerConfig: {
-          executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || undefined,
-          args: ["--no-sandbox", "--disable-setuid-sandbox"],
-          headless: "new", // Use new headless mode
-        },
+      const browser = await puppeteer.launch({
+        executablePath: process.env.PUPPETEER_EXECUTABLE_PATH,
+        args: ["--no-sandbox", "--disable-setuid-sandbox"],
+        headless: "new",
       });
 
-      const pngData = await readFile(tempOutput);
+      try {
+        const { data } = await renderMermaid(browser, diagram, "png", {
+          backgroundColor: "white",
+        });
 
-      // Cleanup
-      await Promise.all([unlink(tempInput).catch(() => {}), unlink(tempOutput).catch(() => {})]);
-
-      return new Response(pngData, {
-        headers: { "Content-Type": "image/png" },
-      });
+        return new Response(data, {
+          headers: { "Content-Type": "image/png" },
+        });
+      } finally {
+        await browser.close();
+      }
     } catch (error) {
       console.error("Error:", error);
       return new Response("Internal Server Error", { status: 500 });
