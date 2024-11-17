@@ -2,7 +2,7 @@ import { renderMermaid } from "@mermaid-js/mermaid-cli";
 import { serve } from "bun";
 import puppeteer from "puppeteer-core";
 
-const PORT = 3022;
+const PORT = parseInt(process.env.PORT || "3022");
 
 const server = serve({
   port: PORT,

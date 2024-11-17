@@ -11,7 +11,7 @@ Add this service to your `docker-compose.yml`:
 ```yaml
 services:
   mermaid-renderer:
-    image: ghcr.io/erik-balfe/mermaid-renderer:latest
+    image: ghcr.io/erik-balfe/mermaid-renderer-server:latest
     ports:
       - "3022:3022"
 ```
@@ -93,59 +93,55 @@ And here's the improved CONTRIBUTING.md:
 # Contributing to Mermaid Renderer Server
 
 We love your input! We want to make contributing to Mermaid Renderer Server as easy and transparent as possible.
-
 ## Development Process
 
-We use GitFlow-inspired branching strategy:
+We use a simplified branching strategy focusing solely on the `master` branch:
 
-1. `master` - Production-ready code
-2. `develop` - Development branch for integrating features
-3. Feature branches - For new features and fixes
+`master` - Production-ready code where all changes are merged.
 
 ### Creating a New Feature
 
 1. Fork the repository
-2. Create a feature branch from `develop`:
+2. Make your changes directly on the `master` branch or create a feature branch if you prefer to work in isolation:
    ```bash
-   git checkout develop
    git checkout -b feature/your-feature-name
-````
+   ```
 
-3. Make your changes
-4. Write or update tests as needed
-5. Run tests to ensure everything works:
+3. Write or update tests as needed
+4. Run tests to ensure everything works:
    ```bash
    bun test
    ```
-6. Commit your changes:
+5. Commit your changes:
    ```bash
    git commit -m "Add some feature"
    ```
-7. Push to your fork:
+6. Push to your fork:
    ```bash
-   git push origin feature/your-feature-name
+   git push origin master
    ```
-8. Create a Pull Request to our `develop` branch
+7. Create a Pull Request to merge your changes into the `master` branch
 
 ## Release Process
 
-1. Merge `develop` into `master`:
-
-   ```bash
-   git checkout master
-   git merge --no-ff develop
-   ```
-
-2. Tag the new version:
+1. Tag the new version directly on the `master` branch:
 
    ```bash
    git tag -a v1.0.0 -m "Release version 1.0.0"
    ```
 
-3. Push changes with tags:
+2. Push changes with tags:
    ```bash
    git push origin master --tags
    ```
+
+This will trigger the GitHub Actions workflow to:
+
+- Build the Docker image
+- Tag it with both `latest` and the version number
+- Push to GitHub Container Registry as:
+  - `ghcr.io/erik-balfe/mermaid-renderer-server:latest`
+  - `ghcr.io/erik-balfe/mermaid-renderer-server:1.0.0`
 
 This will trigger the GitHub Actions workflow to:
 
@@ -193,3 +189,4 @@ mermaid-renderer-server/
 ## Questions?
 
 Feel free to open an issue for any questions or concerns.
+````
