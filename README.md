@@ -1,5 +1,10 @@
 # mermaid-renderer-server
 
+## Description
+
+This is a simple server that renders mermaid diagrams.
+It runs http server on 3022 port and accepts requests with mermaid diagram text and returns rendered diagram as png image.
+
 To install dependencies:
 
 ```bash
