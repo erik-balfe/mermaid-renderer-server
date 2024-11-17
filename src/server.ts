@@ -7,6 +7,12 @@ const PORT = 3022;
 const server = serve({
   port: PORT,
   async fetch(req) {
+    if (new URL(req.url).pathname === "/health") {
+      return new Response(JSON.stringify({ status: "ok" }), {
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
     if (req.method !== "POST" || new URL(req.url).pathname !== "/render") {
       return new Response("Not Found", { status: 404 });
     }
@@ -37,7 +43,11 @@ const server = serve({
       }
     } catch (error) {
       console.error("Error:", error);
-      return new Response("Internal Server Error", { status: 500 });
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
+      return new Response(JSON.stringify({ error: "Internal Server Error", details: errorMessage }), {
+        status: 500,
+        headers: { "Content-Type": "application/json" },
+      });
     }
   },
 });
